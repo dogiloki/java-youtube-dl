@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import multitaks.Function;
@@ -98,6 +100,7 @@ public class MainFrame extends javax.swing.JFrame{
         int index=0;
         while((video=cursor.next())!=null){
             String str="<html>";
+            str+=video.format_id+"<br>";
             str+=video.channel+"<br>";
             str+=video.title+"<br>";
             str+=video.duration+"<br>";
@@ -143,10 +146,10 @@ public class MainFrame extends javax.swing.JFrame{
         btn_download_canceled = new javax.swing.JButton();
         btn_pause_resumen = new javax.swing.JButton();
         btn_delete = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btn_open_folder = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         table_videos = new javax.swing.JTable();
-        jButton5 = new javax.swing.JButton();
+        btn_add_video = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -226,10 +229,10 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
-        jButton4.setText("Abrir carpeta");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btn_open_folder.setText("Abrir carpeta");
+        btn_open_folder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btn_open_folderActionPerformed(evt);
             }
         });
 
@@ -246,10 +249,10 @@ public class MainFrame extends javax.swing.JFrame{
         ));
         jScrollPane3.setViewportView(table_videos);
 
-        jButton5.setText("Añadir video");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        btn_add_video.setText("Añadir video");
+        btn_add_video.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                btn_add_videoActionPerformed(evt);
             }
         });
 
@@ -264,9 +267,9 @@ public class MainFrame extends javax.swing.JFrame{
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btn_delete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton4)
+                        .addComponent(btn_open_folder)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton5)
+                        .addComponent(btn_add_video)
                         .addGap(386, 386, 386)
                         .addComponent(btn_pause_resumen)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -283,8 +286,8 @@ public class MainFrame extends javax.swing.JFrame{
                     .addComponent(btn_download_canceled)
                     .addComponent(btn_pause_resumen)
                     .addComponent(btn_delete)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5))
+                    .addComponent(btn_open_folder)
+                    .addComponent(btn_add_video))
                 .addContainerGap())
         );
 
@@ -326,25 +329,30 @@ public class MainFrame extends javax.swing.JFrame{
         });
     }//GEN-LAST:event_btn_deleteActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void btn_add_videoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_add_videoActionPerformed
         String url=JOptionPane.showInputDialog(null,"Ingresa URL del video");
         new VideoDialog(this,true,url).setVisible(true);
         this.getVideos();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_btn_add_videoActionPerformed
 
     private void btn_download_canceledActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_download_canceledActionPerformed
         this.selectionVideos((video,row)->{
             try{
-                ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.url));
+                ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
                 this.downloads.put(row,download);
                 download.start((line)->{
                     this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
                 });
                 download.onCanceled=(text,code)->{
-                    JOptionPane.showMessageDialog(null,"Cancelado",String.valueOf(code),JOptionPane.WARNING_MESSAGE);
+                    
                 };
                 download.onFinalized=(text,code)->{
-                    JOptionPane.showMessageDialog(null,"Finalizado",String.valueOf(code),JOptionPane.INFORMATION_MESSAGE);
+                    try{
+                        Storage.copyFile(VideoDAO.STORAGE_TEMP+"/"+video.filename,video.storage+"/"+video.filename);
+                        Storage.deleteFile(VideoDAO.STORAGE_TEMP+"/"+video.filename);
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                    }
                 };
             }catch(Exception ex){
                 this.table_videos.setValueAt(ex.getMessage(),row,1);
@@ -352,11 +360,11 @@ public class MainFrame extends javax.swing.JFrame{
         });
     }//GEN-LAST:event_btn_download_canceledActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btn_open_folderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_open_folderActionPerformed
         this.selectionVideo((video,row)->{
             Storage.execute(video.storage);
         });
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btn_open_folderActionPerformed
 
     private void btn_pause_resumenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pause_resumenActionPerformed
         this.selectionVideo((video,row)->{
@@ -374,12 +382,12 @@ public class MainFrame extends javax.swing.JFrame{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField box_search;
+    private javax.swing.JButton btn_add_video;
     private javax.swing.JButton btn_delete;
     private javax.swing.JButton btn_download_canceled;
+    private javax.swing.JButton btn_open_folder;
     private javax.swing.JButton btn_pause_resumen;
     private javax.swing.JButton btn_search;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;

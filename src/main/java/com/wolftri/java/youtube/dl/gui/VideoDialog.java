@@ -79,6 +79,8 @@ public class VideoDialog extends javax.swing.JDialog{
                 format.get("vcodec"),
                 format.get("format")
             });
+            this.video.filename=this.video.title+"_"+this.video.format_id;
+            this.video.filename=this.video.filename.replaceAll("[\\\\\\\\/:*?\\\"<>|+]", "")+"."+format.get("ext");
         }
         this.table_formats.setModel(model_formats);
     }
