@@ -2,15 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wolftri</groupId>
-    <artifactId>java-youtube-dl</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>gui-youtube-dlp</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
-        <exec.mainClass>com.wolftri.java.youtube.dl.JavaYoutubeDl</exec.mainClass>
+        <exec.mainClass>com.wolftri.java.youtube.dl.gui.MainFrame</exec.mainClass>
     </properties>
+    <!-- Main-Class: com.wolftri.java.youtube.dl.gui.MainFrame -->
+    
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Build an executable JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.wolftri.java.youtube.dl.gui.MainFrame</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     
     <dependencies>
         <dependency>
@@ -25,5 +47,6 @@
             <version>2.8.9</version>
         </dependency>
     </dependencies>
-    
+    <name>gui-youtube-dlp</name>
+    <description>Descarga video de YouTube utilizando yt-dlp.exe</description>
 </project>

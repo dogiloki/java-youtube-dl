@@ -3,7 +3,7 @@ package com.wolftri.java.youtube.dl.gui;
 import com.google.gson.Gson;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.dto.VideoDTO;
-import config.CustomCommand;
+import com.wolftri.java.youtube.dl.config.CustomCommand;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +80,7 @@ public class VideoDialog extends javax.swing.JDialog{
                 format.get("format")
             });
             this.video.filename=this.video.title+"_"+this.video.format_id;
-            this.video.filename=this.video.filename.replaceAll("[\\\\\\\\/:*?\\\"<>|+]", "")+"."+format.get("ext");
+            this.video.filename=this.video.filename.replaceAll(" ","-").replaceAll("[\\\\\\\\/:*?\\\"<>|+]", "")+"."+format.get("ext");
         }
         this.table_formats.setModel(model_formats);
     }

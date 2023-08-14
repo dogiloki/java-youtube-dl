@@ -5,14 +5,12 @@ import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.dto.SearchDTO;
 import com.wolftri.java.youtube.dl.dto.VideoDTO;
 import com.wolftri.java.youtube.dl.gui.views.VideoPanel;
-import config.CustomCommand;
+import com.wolftri.java.youtube.dl.config.CustomCommand;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import multitaks.Function;
@@ -157,7 +155,7 @@ public class MainFrame extends javax.swing.JFrame{
         panel_videos.setLayout(panel_videosLayout);
         panel_videosLayout.setHorizontalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 802, Short.MAX_VALUE)
+            .addGap(0, 815, Short.MAX_VALUE)
         );
         panel_videosLayout.setVerticalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -299,7 +297,7 @@ public class MainFrame extends javax.swing.JFrame{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 837, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 862, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
