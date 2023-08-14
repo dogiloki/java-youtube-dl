@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import multitaks.Function;
+import multitaks.Persistent.ExecutionObserver;
 import multitaks.directory.Storage;
 
 /**
@@ -40,7 +40,7 @@ public class VideoDialog extends javax.swing.JDialog{
         this.video.url=url;
         try{
             Gson gson=new Gson();
-            String text_json=Function.executeProcess(MessageFormat.format(CustomCommand.LIST_FORMAT.toCommand(),this.video.url));
+            String text_json=ExecutionObserver.execution(MessageFormat.format(CustomCommand.LIST_FORMAT.toCommand(),this.video.url)).start();
             Map<String,String> json=gson.fromJson(text_json,Map.class);
             this.json_formats=gson.fromJson(text_json,Map.class);
             this.video.duration=String.valueOf(json.get("duration"));

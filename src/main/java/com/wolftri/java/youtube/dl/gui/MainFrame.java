@@ -9,14 +9,16 @@ import config.CustomCommand;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import multitaks.Function;
 import multitaks.Http;
+import multitaks.Persistent.ExecutionObserver;
 import multitaks.database.Cursor;
 import multitaks.database.ModelDB;
+import multitaks.directory.Storage;
 
 /**
  *
@@ -30,7 +32,8 @@ public class MainFrame extends javax.swing.JFrame{
     }
     
     private Http http=new Http("https://www.googleapis.com/youtube/v3");
-    private List<VideoDAO> videos=new ArrayList<>();
+    private Map<Integer,VideoDAO> videos=new HashMap<>();
+    private Map<Integer,ExecutionObserver> downloads=new HashMap<>();
     
     public MainFrame(){
         initComponents();
@@ -40,9 +43,8 @@ public class MainFrame extends javax.swing.JFrame{
         this.http.getParams().put("key","AIzaSyC5tQRf8HmtkvdqNiQ7piaIZFJ_Nmw6ufY");
         this.http.getParams().put("part","snippet");
         this.http.getParams().put("maxResults",30);
-        this.table_videos.setRowHeight(150);
-        this.table_videos.setFont(new Font("Arial",Font.PLAIN,20));
-        this.loadVideos();
+        this.table_videos.setRowHeight(160);
+        this.table_videos.setFont(new Font("Arial",Font.PLAIN,18));
         this.getVideos();
     }
     
@@ -53,7 +55,7 @@ public class MainFrame extends javax.swing.JFrame{
             String json=this.http.get("search").toString();
             search=new Gson().fromJson(json,SearchDTO.class);
         }catch(Exception ex){
-            //JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
         this.panel_videos.removeAll();
         this.scroll_panel_videos.updateUI();
@@ -93,6 +95,7 @@ public class MainFrame extends javax.swing.JFrame{
         DefaultTableModel model_videos=new DefaultTableModel();
         model_videos.addColumn("VIDEOS");
         model_videos.addColumn("DESCARGANDO");
+        int index=0;
         while((video=cursor.next())!=null){
             String str="<html>";
             str+=video.channel+"<br>";
@@ -100,8 +103,9 @@ public class MainFrame extends javax.swing.JFrame{
             str+=video.duration+"<br>";
             str+=video.created_at+"<br>";
             str+=video.storage+"</html>";
-            this.videos.add(video);
+            this.videos.put(index,video);
             model_videos.addRow(new Object[]{str,""});
+            index++;
         }
         this.table_videos.setModel(model_videos);
     }
@@ -110,10 +114,18 @@ public class MainFrame extends javax.swing.JFrame{
         return this.table_videos.getSelectedRows();
     }
     
-    public void selectionVideo(Callback action){
+    public void selectionVideos(Callback action){
         for(int row:this.getRowsSelected()){
             action.selectedVideos(this.videos.get(row),row);
         }
+        this.getVideos();
+    }
+    public void selectionVideo(Callback action){
+        int row=this.table_videos.getSelectedRow();
+        if(row==-1){
+            return;
+        }
+        action.selectedVideos(this.videos.get(row),row);
         this.getVideos();
     }
     
@@ -142,7 +154,7 @@ public class MainFrame extends javax.swing.JFrame{
         panel_videos.setLayout(panel_videosLayout);
         panel_videosLayout.setHorizontalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 791, Short.MAX_VALUE)
+            .addGap(0, 802, Short.MAX_VALUE)
         );
         panel_videosLayout.setVerticalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -192,16 +204,22 @@ public class MainFrame extends javax.swing.JFrame{
 
         jTabbedPane1.addTab("YouTube", jPanel1);
 
-        btn_download_canceled.setText("Cancelar");
+        btn_download_canceled.setText("Descargar");
         btn_download_canceled.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_download_canceledActionPerformed(evt);
             }
         });
 
-        btn_pause_resumen.setText("Pausar");
+        btn_pause_resumen.setText("Cacelar");
+        btn_pause_resumen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_pause_resumenActionPerformed(evt);
+            }
+        });
 
         btn_delete.setText("Eliminar");
+        btn_delete.setToolTipText("No elimina  el archivo, únicamente el registro en esta ventana");
         btn_delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_deleteActionPerformed(evt);
@@ -209,6 +227,11 @@ public class MainFrame extends javax.swing.JFrame{
         });
 
         jButton4.setText("Abrir carpeta");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         table_videos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -271,9 +294,10 @@ public class MainFrame extends javax.swing.JFrame{
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1))
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 837, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -297,7 +321,7 @@ public class MainFrame extends javax.swing.JFrame{
     }//GEN-LAST:event_box_searchKeyReleased
 
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
-        this.selectionVideo((video,row)->{
+        this.selectionVideos((video,row)->{
             video.delete();
         });
     }//GEN-LAST:event_btn_deleteActionPerformed
@@ -309,16 +333,36 @@ public class MainFrame extends javax.swing.JFrame{
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void btn_download_canceledActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_download_canceledActionPerformed
-        this.selectionVideo((video,row)->{
+        this.selectionVideos((video,row)->{
             try{
-                Function.executeProcess(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,video.storage,video.url),(line)->{
+                ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.url));
+                this.downloads.put(row,download);
+                download.start((line)->{
                     this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
                 });
+                download.onCanceled=(text,code)->{
+                    JOptionPane.showMessageDialog(null,"Cancelado",String.valueOf(code),JOptionPane.WARNING_MESSAGE);
+                };
+                download.onFinalized=(text,code)->{
+                    JOptionPane.showMessageDialog(null,"Finalizado",String.valueOf(code),JOptionPane.INFORMATION_MESSAGE);
+                };
             }catch(Exception ex){
                 this.table_videos.setValueAt(ex.getMessage(),row,1);
             }
         });
     }//GEN-LAST:event_btn_download_canceledActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        this.selectionVideo((video,row)->{
+            Storage.execute(video.storage);
+        });
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void btn_pause_resumenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pause_resumenActionPerformed
+        this.selectionVideo((video,row)->{
+            this.downloads.get(row).cancel();
+        });
+    }//GEN-LAST:event_btn_pause_resumenActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {

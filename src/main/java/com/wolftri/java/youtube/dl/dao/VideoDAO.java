@@ -3,7 +3,7 @@ package com.wolftri.java.youtube.dl.dao;
 import com.google.gson.annotations.Expose;
 import multitaks.database.ModelDB;
 import multitaks.database.annotations.Collect;
-import multitaks.directory.annotations.Key;
+import multitaks.directory.Storage;
 
 /**
  *
@@ -14,6 +14,7 @@ import multitaks.directory.annotations.Key;
 public class VideoDAO extends ModelDB{
     
     public static String BASE_URL="https://www.youtube.com/watch?v={0}";
+    public static String STORAGE_TEMP=Storage.getDir()+"/temp";
     
     @Expose
     public String url;
