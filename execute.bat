@@ -1,1 +1,0 @@
-mvn install:install-file -Dfile=../java-multi-taks-lib/dist/multi-taks.jar -DgroupId=com.wolftri -DartifactId=multi-taks -Dversion=1.0 -Dpackaging=jar
