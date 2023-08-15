@@ -1,9 +1,10 @@
 package com.wolftri.java.youtube.dl.gui.views;
 
-import com.wolftri.java.youtube.dl.dto.VideoDTO;
+import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.gui.MainFrame;
 import com.wolftri.java.youtube.dl.gui.VideoDialog;
 import java.awt.Frame;
+import java.text.MessageFormat;
 import multitaks.Function;
 
 /**
@@ -13,22 +14,26 @@ import multitaks.Function;
 
 public class VideoPanel extends javax.swing.JPanel{
     
-    private VideoDTO video;
     private Frame frame;
+    private String url;
     
-    public VideoPanel(Frame frame, VideoDTO video){
+    public VideoPanel(Frame frame, String title, String id, String thumbnails){
         initComponents();
-        if(video==null || frame==null){
+        if(frame==null){
             return;
         }
         this.frame=frame;
-        this.video=video;
-        this.icon_image.setIcon(Function.generateIcon(
-                    Function.createImageFromURL(video.snippet.thumbnails.get("default").get("url")),
+        try{
+            this.icon_image.setIcon(Function.generateIcon(
+                    Function.createImageFromURL(thumbnails),
                     250,
                     250
             ));
-        this.text_title.setText(video.snippet.title);
+        }catch(Exception ex){
+            
+        }
+        this.url=MessageFormat.format(VideoDAO.BASE_VIDEO_URL,id);
+        this.text_title.setText(title);
     }
     
     @SuppressWarnings("unchecked")
@@ -71,7 +76,7 @@ public class VideoPanel extends javax.swing.JPanel{
     }// </editor-fold>//GEN-END:initComponents
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        new VideoDialog(this.frame,true,this.video).setVisible(true);
+        new VideoDialog(this.frame,true,this.url).setVisible(true);
         ((MainFrame)this.frame).getVideos();
     }//GEN-LAST:event_formMouseClicked
 

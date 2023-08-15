@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import multitaks.Persistent.ExecutionObserver;
 import multitaks.directory.Storage;
+import multitaks.persistent.ExecutionObserver;
 
 /**
  *
@@ -25,7 +25,7 @@ public class VideoDialog extends javax.swing.JDialog{
     
     public VideoDialog(java.awt.Frame parent, boolean modal, VideoDTO video){
         super(parent, modal);
-        this.init(parent,modal,MessageFormat.format(VideoDAO.BASE_URL,video.id.get("videoId")));
+        this.init(parent,modal,MessageFormat.format(VideoDAO.BASE_VIDEO_URL,video.id.get("videoId")));
     }
     
     public VideoDialog(java.awt.Frame parent, boolean modal, String url){

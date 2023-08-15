@@ -1,21 +1,26 @@
 package com.wolftri.java.youtube.dl.gui;
 
-import com.google.gson.Gson;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
-import com.wolftri.java.youtube.dl.dto.SearchDTO;
-import com.wolftri.java.youtube.dl.dto.VideoDTO;
-import com.wolftri.java.youtube.dl.gui.views.VideoPanel;
 import com.wolftri.java.youtube.dl.config.CustomCommand;
+import com.wolftri.java.youtube.dl.gui.views.Browser;
+import com.wolftri.java.youtube.dl.gui.views.VideoPanel;
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import multitaks.Function;
 import multitaks.Http;
-import multitaks.Persistent.ExecutionObserver;
+import multitaks.persistent.ExecutionObserver;
 import multitaks.database.Cursor;
 import multitaks.database.ModelDB;
 import multitaks.directory.Storage;
@@ -30,62 +35,86 @@ public class MainFrame extends javax.swing.JFrame{
     public interface Callback{
         public void selectedVideos(VideoDAO video, int row);
     }
-    
-    private Http http=new Http("https://www.googleapis.com/youtube/v3");
     private Map<Integer,VideoDAO> videos=new HashMap<>();
     private Map<Integer,ExecutionObserver> downloads=new HashMap<>();
+    
+    private ExecutionObserver exec_search=null;
+    
+    private int width, height;
+    private int width_total;
+    private int columns_total;
+    private int x, y;
+    private int rows, columns, count=0;
+    private String title, id, thumbnails;
     
     public MainFrame(){
         initComponents();
         this.setExtendedState(this.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
-        this.scroll_panel_videos.getVerticalScrollBar().setUnitIncrement(15);
-        this.http.getParams().put("key","AIzaSyC5tQRf8HmtkvdqNiQ7piaIZFJ_Nmw6ufY");
-        this.http.getParams().put("part","snippet");
-        this.http.getParams().put("maxResults",30);
-        this.table_videos.setRowHeight(160);
-        this.table_videos.setFont(new Font("Arial",Font.PLAIN,18));
         this.getVideos();
     }
-    
+            
     public void loadVideos(){
-        SearchDTO search=new SearchDTO();
-        try{
-            this.http.getParams().put("q",this.box_search.getText());
-            String json=this.http.get("search").toString();
-            search=new Gson().fromJson(json,SearchDTO.class);
-        }catch(Exception ex){
-            JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        if(this.exec_search!=null){
+            this.exec_search.cancel();
         }
+        
         this.panel_videos.removeAll();
         this.scroll_panel_videos.updateUI();
-        int width=250, height=400;
-        int width_total=this.scroll_panel_videos.getWidth()-25;
-        int columns_total=(int)(Math.floorDiv(width_total,width))-1;
-        int x=0, y=0;
-        int rows=0, count=0;
-        for(VideoDTO video:search.videos){
-            
-            VideoPanel panel=new VideoPanel(this,video);
-            
-            panel.setBounds(x,y,width,height);
-            
-            if(x==0){
-                rows++;
-            }
-            if(count<columns_total){
-                x+=width;
-                count++;
-            }else{
-                y+=height;
-                x=0;
-                count=0;
-            }
-            
-            this.panel_videos.add(panel);
+        
+        this.width=250;
+        this.height=400;
+        this.x=0;
+        this.y=0;
+        this.rows=0;
+        this.columns=0;
+        this.table_videos.setRowHeight(160);
+        this.table_videos.setFont(new Font("Arial",Font.PLAIN,18));
+        this.width_total=this.scroll_panel_videos.getWidth()-25;
+        this.columns_total=(int)(Math.floorDiv(width_total,width))-1;
+        
+        try{
+            String command=MessageFormat.format(CustomCommand.SEARCH_VIDEOS.toCommand(),"50",this.box_search.getText(),"1");
+            this.exec_search=ExecutionObserver.execution(command);
+            this.exec_search.start((line,posi)->{
+                switch(posi%3){
+                    case 0: title=line; break;
+                    case 1: id=line; break;
+                    case 2:{
+                        thumbnails=line;
+                        System.out.println(line);
+                        this.loadVideo();
+                        break;
+                    }
+                }
+            });
+        }catch(Exception ex){
+            ex.printStackTrace();
         }
+    }
+    
+    public void loadVideo(){
+        VideoPanel panel=new VideoPanel(this,this.title,this.id,this.thumbnails);
+        panel.setBounds(x,y,width,height);
+        if(x==0){
+            rows++;
+        }
+        if(columns<columns_total){
+            x+=width;
+            columns++;
+        }else{
+            y+=height;
+            x=0;
+            columns=0;
+        }
+        this.count++;
+        
+        this.panel_videos.add(panel);
         this.panel_videos.updateUI();
-        this.panel_videos.setPreferredSize(Function.createDimencion(width_total,rows*height));
+        this.panel_videos.setPreferredSize(Function.createDimencion(this.width_total,this.rows*this.height));
+        this.title=null;
+        this.id=null;
+        this.thumbnails=null;
     }
     
     public void getVideos(){
@@ -136,10 +165,10 @@ public class MainFrame extends javax.swing.JFrame{
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        scroll_panel_videos = new javax.swing.JScrollPane();
-        panel_videos = new javax.swing.JPanel();
         box_search = new javax.swing.JTextField();
         btn_search = new javax.swing.JButton();
+        scroll_panel_videos = new javax.swing.JScrollPane();
+        panel_videos = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         btn_download_canceled = new javax.swing.JButton();
         btn_pause_resumen = new javax.swing.JButton();
@@ -150,19 +179,6 @@ public class MainFrame extends javax.swing.JFrame{
         btn_add_video = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        javax.swing.GroupLayout panel_videosLayout = new javax.swing.GroupLayout(panel_videos);
-        panel_videos.setLayout(panel_videosLayout);
-        panel_videosLayout.setHorizontalGroup(
-            panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 815, Short.MAX_VALUE)
-        );
-        panel_videosLayout.setVerticalGroup(
-            panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 390, Short.MAX_VALUE)
-        );
-
-        scroll_panel_videos.setViewportView(panel_videos);
 
         box_search.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -177,6 +193,19 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
+        javax.swing.GroupLayout panel_videosLayout = new javax.swing.GroupLayout(panel_videos);
+        panel_videos.setLayout(panel_videosLayout);
+        panel_videosLayout.setHorizontalGroup(
+            panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 830, Short.MAX_VALUE)
+        );
+        panel_videosLayout.setVerticalGroup(
+            panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 325, Short.MAX_VALUE)
+        );
+
+        scroll_panel_videos.setViewportView(panel_videos);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -186,7 +215,7 @@ public class MainFrame extends javax.swing.JFrame{
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scroll_panel_videos)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(box_search)
+                        .addComponent(box_search, javax.swing.GroupLayout.DEFAULT_SIZE, 758, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_search)))
                 .addContainerGap())
@@ -297,7 +326,7 @@ public class MainFrame extends javax.swing.JFrame{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 862, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -339,7 +368,7 @@ public class MainFrame extends javax.swing.JFrame{
                 if(!Storage.exists(video.getSrc())){
                     ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
                     this.downloads.put(row,download);
-                    download.start((line)->{
+                    download.start((line,posi)->{
                         this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
                     });
                     download.onCanceled=(text,code)->{
