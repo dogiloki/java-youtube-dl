@@ -105,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame{
             str+=video.created_at+"<br>";
             str+=video.storage+"</html>";
             this.videos.put(index,video);
-            model_videos.addRow(new Object[]{str,""});
+            model_videos.addRow(new Object[]{str,Storage.exists(video.getSrc())?"Ya esta descargado":""});
             index++;
         }
         this.table_videos.setModel(model_videos);
@@ -336,22 +336,24 @@ public class MainFrame extends javax.swing.JFrame{
     private void btn_download_canceledActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_download_canceledActionPerformed
         this.selectionVideos((video,row)->{
             try{
-                ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
-                this.downloads.put(row,download);
-                download.start((line)->{
-                    this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
-                });
-                download.onCanceled=(text,code)->{
-                    
-                };
-                download.onFinalized=(text,code)->{
-                    try{
-                        Storage.copyFile(VideoDAO.STORAGE_TEMP+"/"+video.filename,video.storage+"/"+video.filename);
-                        Storage.deleteFile(VideoDAO.STORAGE_TEMP+"/"+video.filename);
-                    }catch(Exception ex){
-                        ex.printStackTrace();
-                    }
-                };
+                if(!Storage.exists(video.getSrc())){
+                    ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
+                    this.downloads.put(row,download);
+                    download.start((line)->{
+                        this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
+                    });
+                    download.onCanceled=(text,code)->{
+
+                    };
+                    download.onFinalized=(text,code)->{
+                        try{
+                            Storage.copyFile(VideoDAO.STORAGE_TEMP+"/"+video.filename,video.getSrc());
+                            Storage.deleteFile(VideoDAO.STORAGE_TEMP+"/"+video.filename);
+                        }catch(Exception ex){
+                            ex.printStackTrace();
+                        }
+                    };
+                }
             }catch(Exception ex){
                 this.table_videos.setValueAt(ex.getMessage(),row,1);
             }

@@ -50,4 +50,8 @@ public class VideoDAO extends ModelDB{
         
     }
     
+    public String getSrc(){
+        return this.storage+"/"+this.filename;
+    }
+    
 }

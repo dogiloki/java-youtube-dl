@@ -79,8 +79,6 @@ public class VideoDialog extends javax.swing.JDialog{
                 format.get("vcodec"),
                 format.get("format")
             });
-            this.video.filename=this.video.title+"_"+this.video.format_id;
-            this.video.filename=this.video.filename.replaceAll(" ","-").replaceAll("[\\\\\\\\/:*?\\\"<>|+]", "")+"."+format.get("ext");
         }
         this.table_formats.setModel(model_formats);
     }
@@ -168,6 +166,8 @@ public class VideoDialog extends javax.swing.JDialog{
     private void btn_add_list_downloadsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_add_list_downloadsActionPerformed
         this.video.storage=this.box_storage.getText();
         this.video.format_id=this.table_formats.getValueAt(this.table_formats.getSelectedRow(),0).toString();
+        this.video.filename=this.video.title+"_"+this.video.format_id;
+        this.video.filename=this.video.filename.replaceAll(" ","-").replaceAll("[\\\\\\\\/:*?\\\"<>|+]", "")+"."+this.table_formats.getValueAt(this.table_formats.getSelectedRow(),1).toString();
         this.video.save();
         dispose();
     }//GEN-LAST:event_btn_add_list_downloadsActionPerformed
