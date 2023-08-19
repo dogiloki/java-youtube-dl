@@ -2,29 +2,21 @@ package com.wolftri.java.youtube.dl.gui;
 
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.config.CustomCommand;
-import com.wolftri.java.youtube.dl.gui.views.Browser;
 import com.wolftri.java.youtube.dl.gui.views.VideoPanel;
-import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import multitaks.Function;
-import multitaks.Http;
 import multitaks.persistent.ExecutionObserver;
 import multitaks.database.Cursor;
 import multitaks.database.ModelDB;
+import multitaks.directory.FileBlock;
 import multitaks.directory.Storage;
-
+import multitaks.socket.SocketServer;
 /**
  *
  * @author dogi_
@@ -39,6 +31,7 @@ public class MainFrame extends javax.swing.JFrame{
     private Map<Integer,ExecutionObserver> downloads=new HashMap<>();
     
     private ExecutionObserver exec_search=null;
+    private ServerSocketDialog socket_dialog=new ServerSocketDialog(this,true);
     
     private int width, height;
     private int width_total;
@@ -52,6 +45,7 @@ public class MainFrame extends javax.swing.JFrame{
         this.setExtendedState(this.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
         this.getVideos();
+        this.loadVideos();
     }
             
     public void loadVideos(){
@@ -82,7 +76,6 @@ public class MainFrame extends javax.swing.JFrame{
                     case 1: id=line; break;
                     case 2:{
                         thumbnails=line;
-                        System.out.println(line);
                         this.loadVideo();
                         break;
                     }
@@ -177,6 +170,10 @@ public class MainFrame extends javax.swing.JFrame{
         jScrollPane3 = new javax.swing.JScrollPane();
         table_videos = new javax.swing.JTable();
         btn_add_video = new javax.swing.JButton();
+        btn_transfer = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        btn_start_server = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -197,7 +194,7 @@ public class MainFrame extends javax.swing.JFrame{
         panel_videos.setLayout(panel_videosLayout);
         panel_videosLayout.setHorizontalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 830, Short.MAX_VALUE)
+            .addGap(0, 895, Short.MAX_VALUE)
         );
         panel_videosLayout.setVerticalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -213,9 +210,9 @@ public class MainFrame extends javax.swing.JFrame{
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scroll_panel_videos)
+                    .addComponent(scroll_panel_videos, javax.swing.GroupLayout.DEFAULT_SIZE, 854, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(box_search, javax.swing.GroupLayout.DEFAULT_SIZE, 758, Short.MAX_VALUE)
+                        .addComponent(box_search)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_search)))
                 .addContainerGap())
@@ -228,13 +225,13 @@ public class MainFrame extends javax.swing.JFrame{
                     .addComponent(box_search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_search))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroll_panel_videos, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                .addComponent(scroll_panel_videos, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("YouTube", jPanel1);
 
-        btn_download_canceled.setText("Descargar");
+        btn_download_canceled.setText("Descargar en este dispositivo");
         btn_download_canceled.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_download_canceledActionPerformed(evt);
@@ -283,6 +280,13 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
+        btn_transfer.setText("Transferir");
+        btn_transfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_transferActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -290,35 +294,52 @@ public class MainFrame extends javax.swing.JFrame{
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btn_delete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_open_folder)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_add_video)
-                        .addGap(386, 386, 386)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 240, Short.MAX_VALUE)
                         .addComponent(btn_pause_resumen)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_download_canceled)))
+                        .addComponent(btn_transfer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_download_canceled))
+                    .addComponent(jScrollPane3))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_download_canceled)
                     .addComponent(btn_pause_resumen)
                     .addComponent(btn_delete)
                     .addComponent(btn_open_folder)
-                    .addComponent(btn_add_video))
+                    .addComponent(btn_add_video)
+                    .addComponent(btn_transfer))
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Videos", jPanel2);
+        jTabbedPane1.addTab("Descargas", jPanel2);
+
+        jMenu1.setText("Opciones");
+
+        btn_start_server.setText("Conectarse");
+        btn_start_server.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_start_serverActionPerformed(evt);
+            }
+        });
+        jMenu1.add(btn_start_server);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -401,6 +422,45 @@ public class MainFrame extends javax.swing.JFrame{
         });
     }//GEN-LAST:event_btn_pause_resumenActionPerformed
 
+    private void btn_start_serverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_start_serverActionPerformed
+        this.socket_dialog.setVisible(true);
+    }//GEN-LAST:event_btn_start_serverActionPerformed
+
+    private void btn_transferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_transferActionPerformed
+        SocketServer server=this.socket_dialog.server;
+        if(!server.isStart()){
+            JOptionPane.showMessageDialog(null,"El servidor no esta iniciado","Advertencia",JOptionPane.ERROR_MESSAGE);
+        }
+        this.selectionVideos((video,row)->{
+            try{
+                Storage s=new Storage(video.getSrc());
+                if(!s.exists()){
+                    JOptionPane.showMessageDialog(null,"El archivo no esta descargado o se ha movido","Advertencia",JOptionPane.ERROR_MESSAGE);
+                }
+                this.table_videos.setValueAt("Esperando: "+s.getName(),row,1);
+                server.emit("file_name",s.getName());
+                server.on("file_name_success",(message)->{
+                    if(Boolean.parseBoolean(message)){
+                       FileBlock file=s.fileBlock(8192);
+                       try{
+                            this.table_videos.setValueAt("Enviando: "+s.getName(),row,1);
+                            byte[] b;
+                            while((b=file.read())!=null){
+                                server.emit("file_byte",b);
+                            }
+                            this.table_videos.setValueAt("Finalizado: "+s.getName(),row,1);
+                       }catch(Exception ex){
+                           this.table_videos.setValueAt("Error: "+s.getName(),row,1);
+                           ex.printStackTrace();
+                       }
+                    }
+                });
+            }catch(Exception ex){
+                this.table_videos.setValueAt(ex.getMessage(),row,1);
+            }
+        });
+    }//GEN-LAST:event_btn_transferActionPerformed
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -417,6 +477,10 @@ public class MainFrame extends javax.swing.JFrame{
     private javax.swing.JButton btn_open_folder;
     private javax.swing.JButton btn_pause_resumen;
     private javax.swing.JButton btn_search;
+    private javax.swing.JMenuItem btn_start_server;
+    private javax.swing.JButton btn_transfer;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;

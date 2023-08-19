@@ -93,7 +93,7 @@
     </Container>
     <Component class="javax.swing.JButton" name="btn_add_list_downloads">
       <Properties>
-        <Property name="text" type="java.lang.String" value="A&#xf1;adir a la lista"/>
+        <Property name="text" type="java.lang.String" value="A&#xf1;adir a descargas"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_add_list_downloadsActionPerformed"/>

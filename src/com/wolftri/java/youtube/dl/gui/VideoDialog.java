@@ -111,7 +111,7 @@ public class VideoDialog extends javax.swing.JDialog{
         ));
         jScrollPane1.setViewportView(table_formats);
 
-        btn_add_list_downloads.setText("Añadir a la lista");
+        btn_add_list_downloads.setText("Añadir a descargas");
         btn_add_list_downloads.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_add_list_downloadsActionPerformed(evt);
