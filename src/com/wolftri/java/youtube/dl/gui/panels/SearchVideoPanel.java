@@ -77,6 +77,7 @@ public class SearchVideoPanel extends javax.swing.JPanel{
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
         new VideoDialog(this.frame,true,this.url).setVisible(true);
+        ((MainFrame)this.frame).getDownload().loadVideos();
     }//GEN-LAST:event_formMouseClicked
 
 

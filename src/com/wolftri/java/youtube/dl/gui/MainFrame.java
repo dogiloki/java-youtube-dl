@@ -34,6 +34,10 @@ public class MainFrame extends javax.swing.JFrame{
         Function.setPanel(this.panel_videos,this.videos);
     }
     
+    public DownloadPanel getDownload(){
+        return this.download;
+    }
+    
     public VideosPanel getVideosPanel(){
         return this.videos;
     }

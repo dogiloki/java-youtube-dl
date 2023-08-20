@@ -268,6 +268,7 @@ public class DownloadPanel extends javax.swing.JPanel{
 
     private void btn_delete_allActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_delete_allActionPerformed
         new VideoDAO().getCollection().delete();
+        this.loadVideos();
     }//GEN-LAST:event_btn_delete_allActionPerformed
 
     private void btn_download_transferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_download_transferActionPerformed
