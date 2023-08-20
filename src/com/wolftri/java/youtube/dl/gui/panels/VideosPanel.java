@@ -117,6 +117,7 @@ public class VideosPanel extends javax.swing.JPanel{
         btn_transfer = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         box_log = new javax.swing.JTextArea();
+        download_app = new javax.swing.JButton();
 
         list_videos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(list_videos);
@@ -149,6 +150,13 @@ public class VideosPanel extends javax.swing.JPanel{
         box_log.setRows(5);
         jScrollPane2.setViewportView(box_log);
 
+        download_app.setText("Descargar app");
+        download_app.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                download_appActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -159,15 +167,16 @@ public class VideosPanel extends javax.swing.JPanel{
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(text_code_qr, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(box_port, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(box_port)
                             .addComponent(jLabel1)
-                            .addComponent(btn_start)))
+                            .addComponent(btn_start, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(download_app, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(text_qr)
                     .addComponent(jScrollPane2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(box_search)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -187,7 +196,9 @@ public class VideosPanel extends javax.swing.JPanel{
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(box_port, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btn_start))
+                                .addComponent(btn_start)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(download_app))
                             .addComponent(text_code_qr, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(text_qr)
@@ -245,6 +256,10 @@ public class VideosPanel extends javax.swing.JPanel{
         }
     }//GEN-LAST:event_btn_transferActionPerformed
 
+    private void download_appActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_download_appActionPerformed
+        this.generateQR("https://github.com/dogiloki/java-youtube-dl/raw/main/app/app-yt-dl.apk");
+    }//GEN-LAST:event_download_appActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea box_log;
@@ -252,6 +267,7 @@ public class VideosPanel extends javax.swing.JPanel{
     private javax.swing.JTextField box_search;
     private javax.swing.JButton btn_start;
     private javax.swing.JButton btn_transfer;
+    private javax.swing.JButton download_app;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

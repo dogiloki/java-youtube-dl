@@ -20,7 +20,6 @@ public class MainFrame extends javax.swing.JFrame{
     private SearchPanel search;
     private DownloadPanel download;
     private VideosPanel videos;
-    private ServerSocketDialog socket_dialog=new ServerSocketDialog(this,true);
     
     public MainFrame(){
         initComponents();
@@ -44,8 +43,6 @@ public class MainFrame extends javax.swing.JFrame{
         panel_download = new javax.swing.JPanel();
         panel_videos = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        btn_start_server = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -57,7 +54,7 @@ public class MainFrame extends javax.swing.JFrame{
         );
         panel_searchLayout.setVerticalGroup(
             panel_searchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 428, Short.MAX_VALUE)
+            .addGap(0, 447, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Busqueda", panel_search);
@@ -70,7 +67,7 @@ public class MainFrame extends javax.swing.JFrame{
         );
         panel_downloadLayout.setVerticalGroup(
             panel_downloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 428, Short.MAX_VALUE)
+            .addGap(0, 447, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Descargas", panel_download);
@@ -83,22 +80,10 @@ public class MainFrame extends javax.swing.JFrame{
         );
         panel_videosLayout.setVerticalGroup(
             panel_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 428, Short.MAX_VALUE)
+            .addGap(0, 447, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Videos", panel_videos);
-
-        jMenu1.setText("Opciones");
-
-        btn_start_server.setText("Conectarse");
-        btn_start_server.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_start_serverActionPerformed(evt);
-            }
-        });
-        jMenu1.add(btn_start_server);
-
-        jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
 
@@ -108,7 +93,7 @@ public class MainFrame extends javax.swing.JFrame{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -122,10 +107,6 @@ public class MainFrame extends javax.swing.JFrame{
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_start_serverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_start_serverActionPerformed
-        this.socket_dialog.setVisible(true);
-    }//GEN-LAST:event_btn_start_serverActionPerformed
-
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -135,8 +116,6 @@ public class MainFrame extends javax.swing.JFrame{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem btn_start_server;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel panel_download;
