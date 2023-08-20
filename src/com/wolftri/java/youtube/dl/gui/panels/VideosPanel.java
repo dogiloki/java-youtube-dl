@@ -84,7 +84,7 @@ public class VideosPanel extends javax.swing.JPanel{
                     this.addLog("["+index+"] Enviando el archivo...");
                     try{
                         byte[] b;
-                        FileBlock f=s.fileBlock(10240);
+                        FileBlock f=s.fileBlock(1048576);
                         while((b=f.read())!=null){
                             this.server.emit("file_byte",b);
                         }
