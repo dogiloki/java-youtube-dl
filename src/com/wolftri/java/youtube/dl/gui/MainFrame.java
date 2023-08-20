@@ -3,6 +3,7 @@ package com.wolftri.java.youtube.dl.gui;
 import com.wolftri.java.youtube.dl.gui.panels.DownloadPanel;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.gui.panels.SearchPanel;
+import com.wolftri.java.youtube.dl.gui.panels.VideosPanel;
 import multitaks.Function;
 
 /**
@@ -18,6 +19,7 @@ public class MainFrame extends javax.swing.JFrame{
     
     private SearchPanel search;
     private DownloadPanel download;
+    private VideosPanel videos;
     private ServerSocketDialog socket_dialog=new ServerSocketDialog(this,true);
     
     public MainFrame(){
@@ -27,8 +29,10 @@ public class MainFrame extends javax.swing.JFrame{
         this.setLocationRelativeTo(null);
         this.download=new DownloadPanel(this);
         this.search=new SearchPanel(this);
+        this.videos=new VideosPanel();
         Function.setPanel(this.panel_download,this.download);
         Function.setPanel(this.panel_search,this.search);
+        Function.setPanel(this.panel_videos,this.videos);
     }
     
     @SuppressWarnings("unchecked")

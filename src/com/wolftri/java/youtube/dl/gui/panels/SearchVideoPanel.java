@@ -12,12 +12,12 @@ import multitaks.Function;
  * @author dogi_
  */
 
-public class VideoPanel extends javax.swing.JPanel{
+public class SearchVideoPanel extends javax.swing.JPanel{
     
     private Frame frame;
     private String url;
     
-    public VideoPanel(Frame frame, String title, String id, String thumbnails){
+    public SearchVideoPanel(Frame frame, String title, String id, String thumbnails){
         initComponents();
         if(frame==null){
             return;

@@ -52,7 +52,7 @@ public class VideoDialog extends javax.swing.JDialog{
             JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
         this.text_title.setText(this.video.title);
-        this.box_storage.setText(Storage.getDir()+"/descargas");
+        this.box_storage.setText(VideoDAO.STORAGE_VIDEOS);
         this.loadTable();
     }
     
@@ -118,7 +118,10 @@ public class VideoDialog extends javax.swing.JDialog{
             }
         });
 
+        box_storage.setEnabled(false);
+
         btn_change_storage.setText("Examinar");
+        btn_change_storage.setEnabled(false);
         btn_change_storage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_change_storageActionPerformed(evt);

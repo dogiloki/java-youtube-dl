@@ -16,6 +16,7 @@ public class VideoDAO extends ModelDB{
     public static String BASE_SEARCH_URL="https://www.youtube.com/results?search_query={0}";
     public static String BASE_VIDEO_URL="https://www.youtube.com/watch?v={0}";
     public static String STORAGE_TEMP=Storage.getDir()+"/temp";
+    public static String STORAGE_VIDEOS=Storage.getDir()+"/descargas";
     
     @Expose
     public String url;

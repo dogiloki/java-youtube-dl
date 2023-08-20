@@ -65,7 +65,7 @@ public class SearchPanel extends javax.swing.JPanel {
     }
     
     public void loadVideo(){
-        VideoPanel panel=new VideoPanel(this.parent,this.title,this.id,this.thumbnails);
+        SearchVideoPanel panel=new SearchVideoPanel(this.parent,this.title,this.id,this.thumbnails);
         panel.setBounds(x,y,width,height);
         if(x==0){
             rows++;
