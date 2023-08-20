@@ -5,13 +5,16 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import java.awt.image.BufferedImage;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import multitaks.Function;
 import multitaks.directory.DirectoryList;
+import multitaks.directory.FileBlock;
 import multitaks.directory.Storage;
 import multitaks.socket.SocketServer;
 
@@ -37,13 +40,15 @@ public class VideosPanel extends javax.swing.JPanel{
         int index=0;
         String search=this.box_search.getText();
         while(files.hasNext()){
-            String path=files.next().toString();
-            String name=Storage.getName(path);
+            Path path=files.next();
+            String src=path.toString();
+            String name=path.getFileName().toString();
             if(!search.replaceAll(" ","").equals(" ") && !name.contains(search)){
                 continue;
             }
-            model_videos.add(index,name);
-            this.videos.put(index,new Storage(path));
+            model_videos.add(index,"["+index+"] "+name);
+            this.videos.put(index,new Storage(src));
+            index++;
         }
         this.list_videos.setModel(model_videos);
     }
@@ -70,6 +75,33 @@ public class VideosPanel extends javax.swing.JPanel{
         this.box_log.setText(text+"\n"+this.box_log.getText());
     }
     
+    public void transferFile(int index, Storage s){
+        try{
+            this.addLog("["+index+"] Esperando confirmación");
+            this.server.emit("file_name",s.getName());
+            this.server.on("file_name_success",(message)->{
+                if(Boolean.parseBoolean(message)){
+                    this.addLog("["+index+"] Enviando el archivo...");
+                    try{
+                        byte[] b;
+                        FileBlock f=s.fileBlock(8192);
+                        while((b=f.read())!=null){
+                            this.server.emit("file_byte",b);
+                        }
+                        this.server.emit("file_byte_success","true");
+                        this.addLog("["+index+"] Archivo enviado");
+                    }catch(Exception ex){
+                        this.addLog("["+index+"] "+ex.getMessage());
+                    }
+                }else{
+                    this.addLog("["+index+"] Transferencia denegada");
+                }
+            });
+        }catch(Exception ex){
+            this.addLog("["+index+"] "+ex.getMessage());
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -86,6 +118,7 @@ public class VideosPanel extends javax.swing.JPanel{
         jScrollPane2 = new javax.swing.JScrollPane();
         box_log = new javax.swing.JTextArea();
 
+        list_videos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(list_videos);
 
         box_search.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -106,6 +139,11 @@ public class VideosPanel extends javax.swing.JPanel{
         });
 
         btn_transfer.setText("Transferir");
+        btn_transfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_transferActionPerformed(evt);
+            }
+        });
 
         box_log.setColumns(20);
         box_log.setRows(5);
@@ -188,6 +226,7 @@ public class VideosPanel extends javax.swing.JPanel{
             };
             this.addLog("Servidor iniciado");
         }catch(Exception ex){
+            this.addLog(ex.getMessage());
             JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btn_startActionPerformed
@@ -195,6 +234,16 @@ public class VideosPanel extends javax.swing.JPanel{
     private void box_searchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_box_searchKeyReleased
         this.loadVideos();
     }//GEN-LAST:event_box_searchKeyReleased
+
+    private void btn_transferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_transferActionPerformed
+        if(!this.server.isStart()){
+            JOptionPane.showMessageDialog(null,"El servidor no esta iniciado","Advertencia",JOptionPane.WARNING_MESSAGE);
+        }
+        for(int index:this.list_videos.getSelectedIndices()){
+            Storage s=this.videos.get(index);
+            this.transferFile(index,s);
+        }
+    }//GEN-LAST:event_btn_transferActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
