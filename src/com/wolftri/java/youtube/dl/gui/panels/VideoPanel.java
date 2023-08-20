@@ -1,4 +1,4 @@
-package com.wolftri.java.youtube.dl.gui.views;
+package com.wolftri.java.youtube.dl.gui.panels;
 
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.gui.MainFrame;
@@ -77,7 +77,6 @@ public class VideoPanel extends javax.swing.JPanel{
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
         new VideoDialog(this.frame,true,this.url).setVisible(true);
-        ((MainFrame)this.frame).getVideos();
     }//GEN-LAST:event_formMouseClicked
 
 
