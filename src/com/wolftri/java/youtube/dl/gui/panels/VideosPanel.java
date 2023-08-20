@@ -1,5 +1,6 @@
 package com.wolftri.java.youtube.dl.gui.panels;
 
+import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
@@ -10,8 +11,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -94,15 +93,18 @@ public class VideosPanel extends javax.swing.JPanel{
         int index=this.videos_transfer.get(s);
         try{
             this.addLog("["+index+"] Esperando confirmación");
-            this.server.emit("file_name",s.getName());
+            FileBlock f=s.fileBlock(1024);
+            this.server.emit("file",s.getName());
             this.server.on("file_name_success",(message)->{
                 if(Boolean.parseBoolean(message)){
                     this.addLog("["+index+"] Enviando el archivo...");
                     try{
                         byte[] b;
-                        FileBlock f=s.fileBlock(1024);
                         while((b=f.read())!=null){
-                            this.server.emit("file_byte",b);
+                            Map<String,Object> json=new HashMap<>();
+                            json.put("size",f.getBlockSize());
+                            json.put("byte",b);
+                            this.server.emit("file_byte",new Gson().toJson(json));
                         }
                         this.server.emit("file_byte_success","true");
                         this.addLog("["+index+"] Archivo enviado");
@@ -116,6 +118,7 @@ public class VideosPanel extends javax.swing.JPanel{
                         this.addLog("["+index+"] "+ex.getMessage());
                     }finally{
                         if(this.videos_transfer_iterator.hasNext()){
+                            s.close();
                             this.transferFile(this.videos_transfer_iterator.next());
                         }else{
                             this.resetTransfer();
@@ -130,6 +133,10 @@ public class VideosPanel extends javax.swing.JPanel{
             this.addLog("["+index+"] "+ex.getMessage());
             this.resetTransfer();
         }
+    }
+    
+    public SocketServer getServer(){
+        return this.server;
     }
     
     @SuppressWarnings("unchecked")
@@ -148,6 +155,7 @@ public class VideosPanel extends javax.swing.JPanel{
         jScrollPane2 = new javax.swing.JScrollPane();
         box_log = new javax.swing.JTextArea();
         download_app = new javax.swing.JButton();
+        btn_open_folder = new javax.swing.JButton();
 
         jScrollPane1.setViewportView(list_videos);
 
@@ -186,6 +194,13 @@ public class VideosPanel extends javax.swing.JPanel{
             }
         });
 
+        btn_open_folder.setText("Abrir carpeta");
+        btn_open_folder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_open_folderActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -200,7 +215,8 @@ public class VideosPanel extends javax.swing.JPanel{
                             .addComponent(box_port)
                             .addComponent(jLabel1)
                             .addComponent(btn_start, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(download_app, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(download_app, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btn_open_folder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(text_qr)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -227,7 +243,9 @@ public class VideosPanel extends javax.swing.JPanel{
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btn_start)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(download_app))
+                                .addComponent(download_app)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_open_folder))
                             .addComponent(text_code_qr, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(text_qr)
@@ -244,6 +262,7 @@ public class VideosPanel extends javax.swing.JPanel{
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_startActionPerformed
+        this.resetTransfer();
         if(this.server.isStart()){
             try{
                 this.server.close();
@@ -278,6 +297,7 @@ public class VideosPanel extends javax.swing.JPanel{
     private void btn_transferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_transferActionPerformed
         if(!this.server.isStart()){
             JOptionPane.showMessageDialog(null,"El servidor no esta iniciado","Advertencia",JOptionPane.WARNING_MESSAGE);
+            return;
         }
         Map<Integer,Storage> videos=new HashMap<>();
         for(int index:this.list_videos.getSelectedIndices()){
@@ -293,11 +313,16 @@ public class VideosPanel extends javax.swing.JPanel{
         this.generateQR("https://github.com/dogiloki/java-youtube-dl/raw/main/app/app-yt-dl.apk");
     }//GEN-LAST:event_download_appActionPerformed
 
+    private void btn_open_folderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_open_folderActionPerformed
+        Storage.execute(VideoDAO.STORAGE_VIDEOS);
+    }//GEN-LAST:event_btn_open_folderActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea box_log;
     private javax.swing.JTextField box_port;
     private javax.swing.JTextField box_search;
+    private javax.swing.JButton btn_open_folder;
     private javax.swing.JButton btn_start;
     private javax.swing.JButton btn_transfer;
     private javax.swing.JButton download_app;

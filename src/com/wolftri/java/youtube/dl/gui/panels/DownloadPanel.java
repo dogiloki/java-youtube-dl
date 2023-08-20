@@ -1,20 +1,25 @@
 package com.wolftri.java.youtube.dl.gui.panels;
 
+import com.google.gson.Gson;
 import com.wolftri.java.youtube.dl.config.CustomCommand;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.gui.MainFrame;
 import com.wolftri.java.youtube.dl.gui.VideoDialog;
 import java.awt.Font;
 import java.awt.Frame;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import multitaks.database.Cursor;
 import multitaks.database.ModelDB;
+import multitaks.directory.FileBlock;
 import multitaks.directory.Storage;
 import multitaks.persistent.ExecutionObserver;
+import multitaks.socket.SocketServer;
 
 /**
  *
@@ -26,6 +31,7 @@ public class DownloadPanel extends javax.swing.JPanel{
     private Frame parent;
     private Map<Integer,VideoDAO> videos=new HashMap<>();
     private Map<Integer,ExecutionObserver> downloads=new HashMap<>();
+    private boolean transfer=false;
     
     public DownloadPanel(Frame parent){
         initComponents();
@@ -57,9 +63,8 @@ public class DownloadPanel extends javax.swing.JPanel{
             str+=video.format_id+"<br>";
             str+=video.channel+"<br>";
             str+=video.title+"<br>";
-            str+=video.duration+"<br>";
-            str+=video.created_at+"<br>";
-            str+=video.storage+"</html>";
+            str+=video.size+"<br>";
+            str+=video.created_at+"</html>";
             this.videos.put(index,video);
             model_videos.addRow(new Object[]{str,downloaded?"Descargado":""});
             index++;
@@ -91,7 +96,6 @@ public class DownloadPanel extends javax.swing.JPanel{
     private void initComponents() {
 
         btn_delete = new javax.swing.JButton();
-        btn_open_folder = new javax.swing.JButton();
         btn_add_video = new javax.swing.JButton();
         btn_cancel = new javax.swing.JButton();
         btn_download = new javax.swing.JButton();
@@ -99,19 +103,13 @@ public class DownloadPanel extends javax.swing.JPanel{
         table_videos = new javax.swing.JTable();
         check_videos_download = new javax.swing.JCheckBox();
         btn_delete_all = new javax.swing.JButton();
+        btn_download_transfer = new javax.swing.JButton();
 
         btn_delete.setText("Eliminar");
         btn_delete.setToolTipText("No elimina  el archivo, únicamente el registro en esta ventana");
         btn_delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_deleteActionPerformed(evt);
-            }
-        });
-
-        btn_open_folder.setText("Abrir carpeta");
-        btn_open_folder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_open_folderActionPerformed(evt);
             }
         });
 
@@ -164,6 +162,13 @@ public class DownloadPanel extends javax.swing.JPanel{
             }
         });
 
+        btn_download_transfer.setText("Descargar y transferir");
+        btn_download_transfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_download_transferActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -171,22 +176,23 @@ public class DownloadPanel extends javax.swing.JPanel{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(check_videos_download)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btn_delete_all)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_delete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_open_folder)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_add_video)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btn_cancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_download)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(check_videos_download)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btn_delete_all)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_delete)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_add_video)
+                                .addGap(31, 31, 31)
+                                .addComponent(btn_cancel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_download_transfer)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_download)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -202,8 +208,8 @@ public class DownloadPanel extends javax.swing.JPanel{
                     .addComponent(btn_cancel)
                     .addComponent(btn_add_video)
                     .addComponent(btn_delete)
-                    .addComponent(btn_open_folder)
-                    .addComponent(btn_delete_all))
+                    .addComponent(btn_delete_all)
+                    .addComponent(btn_download_transfer))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -213,12 +219,6 @@ public class DownloadPanel extends javax.swing.JPanel{
             video.delete();
         });
     }//GEN-LAST:event_btn_deleteActionPerformed
-
-    private void btn_open_folderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_open_folderActionPerformed
-        this.selectionVideo((video,row)->{
-            Storage.execute(video.storage);
-        });
-    }//GEN-LAST:event_btn_open_folderActionPerformed
 
     private void btn_add_videoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_add_videoActionPerformed
         String url=JOptionPane.showInputDialog(null,"Ingresa URL del video");
@@ -270,6 +270,87 @@ public class DownloadPanel extends javax.swing.JPanel{
         new VideoDAO().getCollection().delete();
     }//GEN-LAST:event_btn_delete_allActionPerformed
 
+    private void btn_download_transferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_download_transferActionPerformed
+        SocketServer server=((MainFrame)this.parent).getVideosPanel().getServer();
+        if(!server.isStart()){
+            JOptionPane.showMessageDialog(null,"El servidor no esta iniciado","Advertencia",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        this.btn_download_transfer.setEnabled(false);
+        this.selectionVideo((video,row)->{
+            try{
+                this.table_videos.setValueAt("Esperando confirmación",row,1);
+                server.emit("file",video.filename);
+                server.on("file_name_success",(message)->{
+                    if(Boolean.parseBoolean(message)){
+                        this.transfer=false;
+                        try{
+                            ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
+                            this.downloads.put(row,download);
+                            Storage s=new Storage(VideoDAO.STORAGE_TEMP+"/"+video.filename+".part");
+                            CompletableFuture promise=new CompletableFuture<>();
+                            download.start((line,posi)->{
+                                this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
+                                if(s.exists() && s.getSize()>1024 && !this.transfer){
+                                    this.transfer=true;
+                                    FileBlock f=s.fileBlock(1024);
+                                    byte[] b;
+                                    try{
+                                        while((b=f.read())!=null){
+                                            this.table_videos.setValueAt(b,row,1);
+                                            Map<String,Object> json=new HashMap<>();
+                                            json.put("size",f.getBlockSize());
+                                            json.put("byte",b);
+                                            server.emit("file_byte",new Gson().toJson(json));
+                                        }
+                                        try{
+                                            server.emit("file_byte_success","true");
+                                        }catch(Exception ex){
+                                            this.table_videos.setValueAt(ex.getMessage(),row,1);
+                                        }
+                                        this.table_videos.setValueAt("Archivo enviado",row,1);
+                                        this.btn_download_transfer.setEnabled(true);
+                                    }catch(Exception ex){
+                                        this.table_videos.setValueAt(ex.getMessage(),row,1);
+                                    }finally{
+                                        this.btn_download_transfer.setEnabled(true);
+                                    }    
+                                }
+                            });
+                            download.onCanceled=(text,code)->{
+                                try{
+                                    server.emit("file_byte_success","false");
+                                }catch(IOException ex){
+                                    this.table_videos.setValueAt(ex.getMessage(),row,1);
+                                }
+                                this.table_videos.setValueAt("Archivo no enviado",row,1);
+                                this.btn_download_transfer.setEnabled(true);
+                            };
+                            download.onFinalized=(text,code)->{
+                                try{
+                                    Storage.copyFile(VideoDAO.STORAGE_TEMP+"/"+video.filename,video.getSrc());
+                                    Storage.deleteFile(VideoDAO.STORAGE_TEMP+"/"+video.filename);
+                                }catch(Exception ex){
+                                    ex.printStackTrace();
+                                }
+                                this.btn_download_transfer.setEnabled(true);
+                            };
+                        }catch(Exception ex){
+                            this.table_videos.setValueAt(ex.getMessage(),row,1);
+                            this.btn_download_transfer.setEnabled(true);
+                        }
+                    }else{
+                        this.table_videos.setValueAt("Transferencia denegada",row,1);
+                        this.btn_download_transfer.setEnabled(true);
+                    }
+                });
+            }catch(Exception ex){
+                this.table_videos.setValueAt(ex.getMessage(),row,1);
+                this.btn_download_transfer.setEnabled(true);
+            }
+        });
+    }//GEN-LAST:event_btn_download_transferActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_add_video;
@@ -277,7 +358,7 @@ public class DownloadPanel extends javax.swing.JPanel{
     private javax.swing.JButton btn_delete;
     private javax.swing.JButton btn_delete_all;
     private javax.swing.JButton btn_download;
-    private javax.swing.JButton btn_open_folder;
+    private javax.swing.JButton btn_download_transfer;
     private javax.swing.JCheckBox check_videos_download;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable table_videos;

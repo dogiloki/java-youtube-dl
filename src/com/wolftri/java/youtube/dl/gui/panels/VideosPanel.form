@@ -27,6 +27,7 @@
                           <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="btn_start" max="32767" attributes="0"/>
                           <Component id="download_app" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btn_open_folder" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="text_qr" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -61,6 +62,8 @@
                               <Component id="btn_start" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="download_app" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btn_open_folder" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="text_code_qr" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
                       </Group>
@@ -159,6 +162,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="download_appActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btn_open_folder">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Abrir carpeta"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_open_folderActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

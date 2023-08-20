@@ -3,9 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/Github/Netbeans/java-youtube-dl/src/com/wolftri/java/youtube/dl/gui/MainFrame.java</file>
+            <file>file:/E:/Github/Netbeans/java-youtube-dl/src/com/wolftri/java/youtube/dl/config/CustomCommand.java</file>
+            <file>file:/E:/Github/Netbeans/java-youtube-dl/src/com/wolftri/java/youtube/dl/gui/panels/DownloadPanel.java</file>
             <file>file:/E:/Github/Netbeans/java-youtube-dl/src/com/wolftri/java/youtube/dl/gui/panels/VideosPanel.java</file>
-            <file>file:/E:/Github/Netbeans/java-youtube-dl/src/com/wolftri/java/youtube/dl/gui/panels/SearchVideoPanel.java</file>
         </group>
     </open-files>
 </project-private>

@@ -34,6 +34,10 @@ public class MainFrame extends javax.swing.JFrame{
         Function.setPanel(this.panel_videos,this.videos);
     }
     
+    public VideosPanel getVideosPanel(){
+        return this.videos;
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -93,7 +97,7 @@ public class MainFrame extends javax.swing.JFrame{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
