@@ -5,6 +5,8 @@ import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.gui.panels.SearchPanel;
 import com.wolftri.java.youtube.dl.gui.panels.VideosPanel;
 import multitaks.Function;
+import multitaks.directory.Storage;
+import multitaks.directory.enums.DirectoryType;
 
 /**
  *
@@ -26,6 +28,7 @@ public class MainFrame extends javax.swing.JFrame{
         //this.setExtendedState(this.MAXIMIZED_BOTH);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        Storage.exists(VideoDAO.STORAGE_VIDEOS,DirectoryType.FOLDER,true);
         this.download=new DownloadPanel(this);
         this.search=new SearchPanel(this);
         this.videos=new VideosPanel();

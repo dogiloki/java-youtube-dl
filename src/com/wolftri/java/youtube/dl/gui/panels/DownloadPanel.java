@@ -7,7 +7,6 @@ import com.wolftri.java.youtube.dl.gui.MainFrame;
 import com.wolftri.java.youtube.dl.gui.VideoDialog;
 import java.awt.Font;
 import java.awt.Frame;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -178,21 +177,20 @@ public class DownloadPanel extends javax.swing.JPanel{
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(check_videos_download)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btn_delete_all)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btn_delete)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btn_add_video)
-                                .addGap(31, 31, 31)
-                                .addComponent(btn_cancel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btn_download_transfer)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btn_download)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(check_videos_download)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_delete_all)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_delete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_add_video)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                        .addComponent(btn_cancel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_download_transfer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_download)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -277,8 +275,8 @@ public class DownloadPanel extends javax.swing.JPanel{
             JOptionPane.showMessageDialog(null,"El servidor no esta iniciado","Advertencia",JOptionPane.WARNING_MESSAGE);
             return;
         }
-        this.btn_download_transfer.setEnabled(false);
         this.selectionVideo((video,row)->{
+            this.btn_download_transfer.setEnabled(false);
             try{
                 this.table_videos.setValueAt("Esperando confirmación",row,1);
                 server.emit("file",video.filename);
@@ -319,11 +317,7 @@ public class DownloadPanel extends javax.swing.JPanel{
                                 }
                             });
                             download.onCanceled=(text,code)->{
-                                try{
-                                    server.emit("file_byte_success","false");
-                                }catch(IOException ex){
-                                    this.table_videos.setValueAt(ex.getMessage(),row,1);
-                                }
+                                server.emit("file_byte_success","false");
                                 this.table_videos.setValueAt("Archivo no enviado",row,1);
                                 this.btn_download_transfer.setEnabled(true);
                             };

@@ -109,11 +109,7 @@ public class VideosPanel extends javax.swing.JPanel{
                         this.server.emit("file_byte_success","true");
                         this.addLog("["+index+"] Archivo enviado");
                     }catch(Exception ex){
-                        try{
-                            this.server.emit("file_byte_success","false");
-                        }catch(IOException ex1){
-                            ex.printStackTrace();
-                        }
+                        this.server.emit("file_byte_success","false");
                         this.addLog("["+index+"] Archivo no enviado");
                         this.addLog("["+index+"] "+ex.getMessage());
                     }finally{
@@ -278,10 +274,10 @@ public class VideosPanel extends javax.swing.JPanel{
             this.generateQR(this.server.getAddress());
             this.btn_start.setText("Parar servidor");
             this.server.onConnect=(client)->{
-                this.addLog("Conectado: "+client.getInetAddress());
+                this.addLog("Conectado: "+client.getAddress());
             };
             this.server.onDisconnect=(client)->{
-                this.addLog("Desconectado: "+client.getInetAddress());
+                this.addLog("Desconectado: "+client.getAddress());
             };
             this.addLog("Servidor iniciado");
         }catch(Exception ex){
