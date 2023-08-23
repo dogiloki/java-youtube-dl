@@ -93,7 +93,7 @@ public class VideosPanel extends javax.swing.JPanel{
         int index=this.videos_transfer.get(s);
         try{
             this.addLog("["+index+"] Esperando confirmación");
-            FileBlock f=s.fileBlock(1024);
+            FileBlock f=s.fileBlock(8192);
             this.server.emit("file",s.getName());
             this.server.on("file_name_success",(message)->{
                 if(Boolean.parseBoolean(message)){
@@ -112,6 +112,7 @@ public class VideosPanel extends javax.swing.JPanel{
                         this.server.emit("file_byte_success","false");
                         this.addLog("["+index+"] Archivo no enviado");
                         this.addLog("["+index+"] "+ex.getMessage());
+                        ex.printStackTrace();
                     }finally{
                         if(this.videos_transfer_iterator.hasNext()){
                             s.close();
@@ -128,6 +129,7 @@ public class VideosPanel extends javax.swing.JPanel{
         }catch(Exception ex){
             this.addLog("["+index+"] "+ex.getMessage());
             this.resetTransfer();
+            ex.printStackTrace();
         }
     }
     
