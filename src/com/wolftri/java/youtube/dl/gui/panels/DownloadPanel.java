@@ -42,7 +42,7 @@ public class DownloadPanel extends javax.swing.JPanel{
     public void loadVideos(){
         boolean show_downloaded=this.check_videos_download.isSelected();
         this.videos.clear();
-        RecordList<VideoDAO> videos=new VideoDAO().getCollection().all();
+        RecordList<VideoDAO> videos=new VideoDAO().getCollection().all().orderByDesc("created_at");
         VideoDAO video;
         DefaultTableModel model_videos=new DefaultTableModel();
         model_videos.addColumn("VIDEOS");
