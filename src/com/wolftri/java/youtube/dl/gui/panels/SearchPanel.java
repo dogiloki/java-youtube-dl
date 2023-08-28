@@ -4,8 +4,8 @@ import com.wolftri.java.youtube.dl.config.CustomCommand;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import multitaks.Function;
-import multitaks.persistent.ExecutionObserver;
+import com.dogiloki.multitaks.Function;
+import com.dogiloki.multitaks.persistent.ExecutionObserver;
 
 /**
  *

@@ -6,7 +6,6 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,11 +13,11 @@ import java.util.Map;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import multitaks.Function;
-import multitaks.directory.DirectoryList;
-import multitaks.directory.FileBlock;
-import multitaks.directory.Storage;
-import multitaks.socket.SocketServer;
+import com.dogiloki.multitaks.Function;
+import com.dogiloki.multitaks.directory.DirectoryList;
+import com.dogiloki.multitaks.directory.FileBlock;
+import com.dogiloki.multitaks.directory.Storage;
+import com.dogiloki.multitaks.socket.SocketServer;
 
 /**
  *

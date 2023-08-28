@@ -1,9 +1,9 @@
 package com.wolftri.java.youtube.dl.dao;
 
 import com.google.gson.annotations.Expose;
-import multitaks.database.ModelDB;
-import multitaks.database.annotations.Collect;
-import multitaks.directory.Storage;
+import com.dogiloki.multitaks.database.ModelDB;
+import com.dogiloki.multitaks.database.annotations.Collect;
+import com.dogiloki.multitaks.directory.Storage;
 
 /**
  *
@@ -41,12 +41,6 @@ public class VideoDAO extends ModelDB{
     
     @Expose
     public String filename;
-    
-    @Expose
-    public String created_at;
-    
-    @Expose
-    public String updated_at;
     
     public VideoDAO(){
         

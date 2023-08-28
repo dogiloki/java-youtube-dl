@@ -5,7 +5,7 @@ import com.wolftri.java.youtube.dl.gui.MainFrame;
 import com.wolftri.java.youtube.dl.gui.VideoDialog;
 import java.awt.Frame;
 import java.text.MessageFormat;
-import multitaks.Function;
+import com.dogiloki.multitaks.Function;
 
 /**
  *

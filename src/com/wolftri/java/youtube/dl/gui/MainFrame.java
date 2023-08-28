@@ -4,9 +4,9 @@ import com.wolftri.java.youtube.dl.gui.panels.DownloadPanel;
 import com.wolftri.java.youtube.dl.dao.VideoDAO;
 import com.wolftri.java.youtube.dl.gui.panels.SearchPanel;
 import com.wolftri.java.youtube.dl.gui.panels.VideosPanel;
-import multitaks.Function;
-import multitaks.directory.Storage;
-import multitaks.directory.enums.DirectoryType;
+import com.dogiloki.multitaks.Function;
+import com.dogiloki.multitaks.directory.Storage;
+import com.dogiloki.multitaks.directory.enums.DirectoryType;
 
 /**
  *

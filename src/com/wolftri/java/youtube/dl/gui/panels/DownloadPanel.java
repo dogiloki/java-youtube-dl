@@ -13,12 +13,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import multitaks.database.Cursor;
-import multitaks.database.ModelDB;
-import multitaks.directory.FileBlock;
-import multitaks.directory.Storage;
-import multitaks.persistent.ExecutionObserver;
-import multitaks.socket.SocketServer;
+import com.dogiloki.multitaks.database.record.RecordList;
+import com.dogiloki.multitaks.directory.FileBlock;
+import com.dogiloki.multitaks.directory.Storage;
+import com.dogiloki.multitaks.persistent.ExecutionObserver;
+import com.dogiloki.multitaks.socket.SocketServer;
 
 /**
  *
@@ -43,13 +42,13 @@ public class DownloadPanel extends javax.swing.JPanel{
     public void loadVideos(){
         boolean show_downloaded=this.check_videos_download.isSelected();
         this.videos.clear();
-        Cursor<VideoDAO> cursor=ModelDB.all(VideoDAO.class);
+        RecordList<VideoDAO> videos=new VideoDAO().getCollection().all();
         VideoDAO video;
         DefaultTableModel model_videos=new DefaultTableModel();
         model_videos.addColumn("VIDEOS");
         model_videos.addColumn("DESCARGANDO");
         int index=0;
-        while((video=cursor.next())!=null){
+        while((video=videos.next())!=null){
             boolean downloaded=false;
             if(Storage.exists(video.getSrc())){
                 if(show_downloaded){

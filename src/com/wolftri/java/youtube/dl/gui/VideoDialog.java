@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import multitaks.directory.Storage;
-import multitaks.persistent.ExecutionObserver;
+import com.dogiloki.multitaks.directory.Storage;
+import com.dogiloki.multitaks.persistent.ExecutionObserver;
 
 /**
  *
