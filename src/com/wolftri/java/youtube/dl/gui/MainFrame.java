@@ -28,7 +28,7 @@ public class MainFrame extends javax.swing.JFrame{
         //this.setExtendedState(this.MAXIMIZED_BOTH);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-        Storage.exists(VideoDAO.STORAGE_VIDEOS,DirectoryType.FOLDER,true);
+        new Storage(VideoDAO.STORAGE_VIDEOS,DirectoryType.FOLDER).exists(true);
         this.download=new DownloadPanel(this);
         this.search=new SearchPanel(this);
         this.videos=new VideosPanel();

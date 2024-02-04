@@ -50,7 +50,7 @@ public class DownloadPanel extends javax.swing.JPanel{
         int index=0;
         while((video=videos.next())!=null){
             boolean downloaded=false;
-            if(Storage.exists(video.getSrc())){
+            if(new Storage(video.getSrc()).exists()){
                 if(show_downloaded){
                     downloaded=true;
                 }else{
@@ -235,7 +235,7 @@ public class DownloadPanel extends javax.swing.JPanel{
     private void btn_downloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_downloadActionPerformed
         this.selectionVideos((video,row)->{
             try{
-                if(!Storage.exists(video.getSrc())){
+                if(!new Storage(video.getSrc()).exists()){
                     ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
                     this.downloads.put(row,download);
                     download.start((line,posi)->{
