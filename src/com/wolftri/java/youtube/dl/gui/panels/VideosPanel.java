@@ -39,7 +39,9 @@ public class VideosPanel extends javax.swing.JPanel{
     public void loadVideos(){
         this.list_videos.removeAll();
         DefaultListModel model_videos=new DefaultListModel();
-        DirectoryList files=Storage.listDirectory(VideoDAO.STORAGE_VIDEOS);
+        Storage s_videos=new Storage(VideoDAO.STORAGE_VIDEOS);
+        DirectoryList files=s_videos.listDirectory();
+        s_videos.close();
         int index=0;
         String search=this.box_search.getText();
         while(files.hasNext()){
@@ -311,7 +313,7 @@ public class VideosPanel extends javax.swing.JPanel{
     }//GEN-LAST:event_download_appActionPerformed
 
     private void btn_open_folderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_open_folderActionPerformed
-        Storage.execute(VideoDAO.STORAGE_VIDEOS);
+        new Storage(VideoDAO.STORAGE_VIDEOS).execute();
     }//GEN-LAST:event_btn_open_folderActionPerformed
 
 
