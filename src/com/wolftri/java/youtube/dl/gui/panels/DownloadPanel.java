@@ -52,24 +52,26 @@ public class DownloadPanel extends javax.swing.JPanel{
             boolean downloaded=false;
             Storage s_video=new Storage(video.getSrc());
             if(s_video.exists()){
-                if(show_downloaded){
-                    downloaded=true;
-                }else{
-                    continue;
+                if(new Storage(video.getSrc()).exists()){
+                    if(show_downloaded){
+                        downloaded=true;
+                    }else{
+                        continue;
+                    }
                 }
+                s_video.close();
+                String str="<html>";
+                str+=video.format_id+"<br>";
+                str+=video.channel+"<br>";
+                str+=video.title+"<br>";
+                str+=video.size+"<br>";
+                str+=video.created_at+"</html>";
+                this.videos.put(index,video);
+                model_videos.addRow(new Object[]{str,downloaded?"Descargado":""});
+                index++;
             }
-            s_video.close();
-            String str="<html>";
-            str+=video.format_id+"<br>";
-            str+=video.channel+"<br>";
-            str+=video.title+"<br>";
-            str+=video.size+"<br>";
-            str+=video.created_at+"</html>";
-            this.videos.put(index,video);
-            model_videos.addRow(new Object[]{str,downloaded?"Descargado":""});
-            index++;
+            this.table_videos.setModel(model_videos);
         }
-        this.table_videos.setModel(model_videos);
     }
     
     public int[] getRowsSelected(){
@@ -239,24 +241,26 @@ public class DownloadPanel extends javax.swing.JPanel{
             try{
                 Storage s_video=new Storage(video.getSrc());
                 if(!s_video.exists()){
-                    ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
-                    this.downloads.put(row,download);
-                    download.start((line,posi)->{
-                        this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
-                    });
-                    download.onCanceled=(text,code)->{
+                    if(!new Storage(video.getSrc()).exists()){
+                        ExecutionObserver download=ExecutionObserver.execution(MessageFormat.format(CustomCommand.DOWNLOAD_FORMAT.toCommand(),video.format_id,VideoDAO.STORAGE_TEMP,video.filename,video.url));
+                        this.downloads.put(row,download);
+                        download.start((line,posi)->{
+                            this.table_videos.setValueAt(line.replaceAll("\\[download\\] ",""),row,1);
+                        });
+                        download.onCanceled=(text,code)->{
 
-                    };
-                    download.onFinalized=(text,code)->{
-                        try{
-                            Storage.copyFile(VideoDAO.STORAGE_TEMP+"/"+video.filename,video.getSrc());
-                            Storage.deleteFile(VideoDAO.STORAGE_TEMP+"/"+video.filename);
-                        }catch(Exception ex){
-                            ex.printStackTrace();
-                        }
-                    };
+                        };
+                        download.onFinalized=(text,code)->{
+                            try{
+                                Storage.copyFile(VideoDAO.STORAGE_TEMP+"/"+video.filename,video.getSrc());
+                                Storage.deleteFile(VideoDAO.STORAGE_TEMP+"/"+video.filename);
+                            }catch(Exception ex){
+                                ex.printStackTrace();
+                            }
+                        };
+                    }
+                    s_video.close();
                 }
-                s_video.close();
             }catch(Exception ex){
                 this.table_videos.setValueAt(ex.getMessage(),row,1);
             }

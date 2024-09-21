@@ -30,6 +30,7 @@ public class MainFrame extends javax.swing.JFrame{
         this.setLocationRelativeTo(null);
         Storage s_videos=new Storage(VideoDAO.STORAGE_VIDEOS,DirectoryType.FOLDER);
         s_videos.exists(true);
+        new Storage(VideoDAO.STORAGE_VIDEOS,DirectoryType.FOLDER).exists(true);
         this.download=new DownloadPanel(this);
         this.search=new SearchPanel(this);
         this.videos=new VideosPanel();
