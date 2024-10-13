@@ -17,7 +17,7 @@ import com.dogiloki.multitaks.database.record.RecordList;
 import com.dogiloki.multitaks.directory.FileBlock;
 import com.dogiloki.multitaks.directory.Storage;
 import com.dogiloki.multitaks.persistent.ExecutionObserver;
-import com.dogiloki.multitaks.socket.SocketServer;
+import com.dogiloki.multitaks.server.socket.SocketServer;
 
 /**
  *

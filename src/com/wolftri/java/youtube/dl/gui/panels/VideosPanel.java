@@ -17,7 +17,7 @@ import com.dogiloki.multitaks.Function;
 import com.dogiloki.multitaks.directory.DirectoryList;
 import com.dogiloki.multitaks.directory.FileBlock;
 import com.dogiloki.multitaks.directory.Storage;
-import com.dogiloki.multitaks.socket.SocketServer;
+import com.dogiloki.multitaks.server.socket.SocketServer;
 
 /**
  *
