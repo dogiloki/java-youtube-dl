@@ -51,7 +51,7 @@ public class DownloadPanel extends javax.swing.JPanel{
         while((video=videos.next())!=null){
             boolean downloaded=false;
             Storage s_video=new Storage(video.getSrc());
-            if(s_video.exists()){
+            if(!s_video.exists()){
                 if(new Storage(video.getSrc()).exists()){
                     if(show_downloaded){
                         downloaded=true;
